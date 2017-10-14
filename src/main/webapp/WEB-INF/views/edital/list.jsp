@@ -5,7 +5,7 @@
 <div id="contents" data-ng-controller="listaController as ctrl">
    <div class="mdl-grid">
         <div class="mdl-cell mdl-cell--12-col page-header">
-			<h3><spring:message code="edital.list.title"/></h3>
+			<h3><spring:message code="edital.homologacao.inscricao.title"/></h3>
 		</div>
 	</div>
 	
