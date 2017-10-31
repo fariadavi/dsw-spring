@@ -1,7 +1,9 @@
 <%@include file="/WEB-INF/views/helper/template.jsp" %>
 
-<script>var idEdital = <c:out value="${sessionScope.edital.id}"/></script>
-
+<script>
+	var idEdital = <c:out value="${sessionScope.edital.id}"/>
+	var comissao = 'selecao';
+</script>
 <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/static/third-party/ngTable/ng-table.min.css" />
 
 <!-- https://github.com/kybarg/mdl-selectfield | https://codepen.io/kybarg/pen/dGNeYw -->   
@@ -11,7 +13,7 @@
 <div id="contents" data-ng-controller="inscricaoController as ctrl">
    <div class="mdl-grid">
         <div class="mdl-cell mdl-cell--12-col page-header">
-			<h3><spring:message code="edital.homologacao.inscricao.title"/></h3>
+			<h3><spring:message code="edital.homologacao.inscricao.original.title"/></h3>
 		</div>
 	</div>
                
@@ -41,21 +43,22 @@
 						</td>
 						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.inicial'/>'">
                				<label for="option1_row{{$index}}">
-        						<input id="option1_row{{$index}}" name="homologar_row{{$index}}" type="radio" data-ng-model="item.statusHomologacaoOriginal" data-ng-value="true" />
+        						<input id="option1_row{{$index}}" name="homologar_row{{$index}}" type="radio" data-ng-model="item.homologadoOriginal" data-ng-value="true" />
 								<spring:message code='edital.homologacao.inscricao.table.homologar.confirmar'/>
         					</label>
         					<label for="option2_row{{$index}}">
-        						<input id="option2_row{{$index}}" name="homologar_row{{$index}}" type="radio" data-ng-model="item.statusHomologacaoOriginal" data-ng-value="false" />
+        						<input id="option2_row{{$index}}" name="homologar_row{{$index}}" type="radio" data-ng-model="item.homologadoOriginal" data-ng-value="false" />
         						<spring:message code='edital.homologacao.inscricao.table.homologar.recusar'/>
        						</label>
 						</td>
 						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.justificativa'/>'">
-							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaHomologacaoOriginal" data-ng-disabled="item.statusHomologacaoOriginal || item.statusHomologacaoOriginal == null" ></textarea>
+							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaHomologacaoOriginal" data-ng-disabled="item.homologadoOriginal || item.homologadoOriginal == null" ></textarea>
 <!-- 							class="mdl-textfield__input"  -->
 						</td>
 						<td class="text-center">
-							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" data-ng-disabled="(item.statusHomologacaoOriginal == null || (!item.statusHomologacaoOriginal && (!item.justificativaHomologacaoOriginal || item.justificativaHomologacaoOriginal == null)))"
-								data-ng-click="ctrl.homologarOriginal(item.id, item.statusHomologacaoOriginal, item.justificativaHomologacaoOriginal)">
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" 
+							data-ng-disabled="(item.homologadoOriginal == null || (!item.homologadoOriginal && (!item.justificativaHomologacaoOriginal || item.justificativaHomologacaoOriginal == null)))"
+								data-ng-click="ctrl.homologarOriginal(item.id, item.homologadoOriginal, item.justificativaHomologacaoOriginal)">
 								<spring:message code='edital.homologacao.inscricao.table.comando.enviar'/>
 							</button>
 						</td>

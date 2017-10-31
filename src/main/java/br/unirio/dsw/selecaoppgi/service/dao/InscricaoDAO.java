@@ -44,8 +44,11 @@ public class InscricaoDAO extends AbstractDAO
 		inscricao.setCotaNegros(rs.getInt("cotaNegros") != 0);
 		inscricao.setCotaDeficientes(rs.getInt("cotaDeficientes") != 0);
 		
-		inscricao.setHomologadoOriginal(rs.getInt("homologadoInicial") != 0);
-		inscricao.setHomologadoRecurso(rs.getInt("homologadoRecurso") != 0);
+		if(!(rs.getInt("homologadoInicial") == 0 && rs.getString("justificativaHomologacaoInicial") == null))
+			inscricao.setHomologadoOriginal(rs.getInt("homologadoInicial") != 0);
+		if(!(rs.getInt("homologadoRecurso") == 0 && rs.getString("justificativaHomologacaoRecurso") == null))
+			inscricao.setHomologadoRecurso(rs.getInt("homologadoRecurso") != 0);
+		
 		inscricao.setDispensadoProvaOriginal(rs.getInt("dispensadoProvaInicial") != 0);
 		inscricao.setDispensadoProvaRecurso(rs.getInt("dispensadoProvaRecurso") != 0);
 
@@ -88,7 +91,7 @@ public class InscricaoDAO extends AbstractDAO
 	{
 		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
 					 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
-					 "WHERE i.idEdital = ? AND u.nome LIKE ? ";
+					 "WHERE i.idEdital = ? AND homologadoRecurso = 0 AND justificativaHomologacaoRecurso IS NULL AND u.nome LIKE ? ";
 		
 		String SQLStatus = "";
 		
@@ -104,7 +107,7 @@ public class InscricaoDAO extends AbstractDAO
 				break;
 		}
 		
-		String SQLPaging = "ORDER BY dataAtualizacao DESC LIMIT ? OFFSET ?";
+		String SQLPaging = "ORDER BY u.nome ASC LIMIT ? OFFSET ?";
 		
 		Connection c = getConnection();
 		
@@ -135,6 +138,62 @@ public class InscricaoDAO extends AbstractDAO
 			return null;
 		}
 	}
+
+	/**
+	 * Carrega a lista de inscrições não homologadas de um determinado edital que podem ser homologadas
+	 */
+	public List<InscricaoEdital> carregaAvaliacaoHomologacaoRecurso(int idEdital, int pagina, int tamanhoPagina, String filtroNome, String filtroStatus)
+	{
+		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
+					 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
+					 "WHERE i.idEdital = ? AND homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL AND u.nome LIKE ? ";
+		
+		String SQLStatus = "";
+		
+		switch(filtroStatus) {
+			case "Homologados":
+				SQLStatus = "AND i.homologadoRecurso = 1 "; 
+				break;
+			case "Não-homologados":
+				SQLStatus = "AND i.homologadoRecurso = 0 AND justificativaHomologacaoRecurso IS NOT NULL ";
+				break;
+			case "Aguardando homologação":
+				SQLStatus = "AND i.homologadoRecurso = 0 AND justificativaHomologacaoRecurso IS NULL ";
+				break;
+		}
+		
+		String SQLPaging = "ORDER BY u.nome ASC LIMIT ? OFFSET ?";
+		
+		Connection c = getConnection();
+		
+		if (c == null)
+			return null;
+		
+		try
+		{
+			List<InscricaoEdital> listItems = new ArrayList<InscricaoEdital>();
+			
+			PreparedStatement ps = c.prepareStatement(SQL + SQLStatus + SQLPaging);
+			ps.setLong(1, idEdital);
+			ps.setString(2, "%" + filtroNome + "%");
+			ps.setInt(3, tamanhoPagina);
+			ps.setInt(4, pagina * tamanhoPagina);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next())
+				listItems.add(carrega(rs));
+			
+			c.close();
+			return listItems;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.getAvaliacaoHomologacao: " + e.getMessage());
+			return null;
+		}
+	}
+	
 	
 	/**
 	 * Conta o numero de inscricoes em um edital que atendem aos filtros usados

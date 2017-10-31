@@ -94,6 +94,32 @@ public class HomologacaoController {
 		root.add("Records", jsonInscricoes);
 		return root.toString();
 	}
+	
+	/**
+	 * Ação AJAX que lista todos os candidatos de um edital esperando homologacao da inscrição de recurso
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/inscricao/recurso", method = RequestMethod.GET, produces = "application/json")
+	public String listaRecurso(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
+			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
+			@ModelAttribute("status") String filtroStatus) {
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(idEdital, pagina, tamanho,
+				filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+
+		Gson gson = new Gson();
+		JsonArray jsonInscricoes = new JsonArray();
+
+		for (InscricaoEdital inscricao : inscricoes)
+			jsonInscricoes.add(gson.toJsonTree(inscricao));
+
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");
+		root.addProperty("TotalRecordCount", total);
+		root.add("Records", jsonInscricoes);
+		return root.toString();
+	}
+	
 
 	@ResponseBody
 	@RequestMapping(value = "/edital/homologacao/inscricao/original", method = RequestMethod.POST)
