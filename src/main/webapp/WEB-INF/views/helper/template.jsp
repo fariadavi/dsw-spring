@@ -149,7 +149,7 @@ var contextPath = "${pageContext.request.contextPath}";
 			    	</a>
 		   </c:if>
 		   <c:if test="${sessionScope.edital.status.codigo == 2}">
-			    <a class="sidebar-command" href="${pageContext.request.contextPath}/edital/homologacao/inscricao">
+			    <a class="sidebar-command" href="${pageContext.request.contextPath}/edital/homologacao/original/inscricao">
 			    		<spring:message code="homepage.comandos.edital.inscricoes.homologar"/>
 			    	</a>
 			    <a class="sidebar-command" href="${pageContext.request.contextPath}/edital/homologacao/dispensa">

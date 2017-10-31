@@ -33,6 +33,8 @@ public class InscricaoEdital
 	private List<InscricaoProjetoPesquisa> projetosPesquisa;
 	private List<AvaliacaoProvaEscrita> provasEscritas;
 	
+	private Boolean statusHomologacaoOriginal;
+	
 	/**
 	 * Inicializa uma inscrição em um edital
 	 */
@@ -54,6 +56,23 @@ public class InscricaoEdital
 		this.justificativaDispensaRecurso = "";
 		this.projetosPesquisa = new ArrayList<InscricaoProjetoPesquisa>();
 		this.provasEscritas = new ArrayList<AvaliacaoProvaEscrita>();
+	}
+	
+	public Boolean getStatusHomologacaoOriginal() {
+		if(homologadoOriginal)
+			statusHomologacaoOriginal = true;
+		
+		if(!justificativaHomologacaoOriginal.isEmpty())
+			statusHomologacaoOriginal = true;
+		
+		statusHomologacaoOriginal = true;
+		
+		return null;
+	}
+
+	public void setStatusHomologacaoOriginal(Boolean statusHomologacaoOriginal) {
+		this.homologadoOriginal = statusHomologacaoOriginal;
+		this.statusHomologacaoOriginal = statusHomologacaoOriginal;
 	}
 	
 	/**

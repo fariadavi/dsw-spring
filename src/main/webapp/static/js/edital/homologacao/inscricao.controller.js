@@ -1,11 +1,14 @@
 App.controller("inscricaoController", function ($scope, inscricaoDataService, NgTableParams) {
 	var self = this;
 	
+	$scope.tipoStatus = ["Aguardando homologação", "Homologados", "Não-homologados", "Todos"];
+	
 	/**
 	 * Filtros
 	 */
 	$scope.filtros = {
-		nome: ""
+		nome: "",
+		statusHomologacao: "Todos"
 	}
 	
 	/*
@@ -23,26 +26,27 @@ App.controller("inscricaoController", function ($scope, inscricaoDataService, Ng
 	}
 	
 	/*
-	 * Navega para a pagina de visualizacao de inscricao //REMOVER?
+	 * Atualiza o status de homologacao original de uma inscrição
 	 */
-	self.edita = function(id) {
-		window.location = contextPath + "/homologacao/inscricao/edit/" + id;
+	self.homologarOriginal = function(id, homologado, justificativa) {
+		return inscricaoDataService.homologarOriginal({
+			id:id,
+			homologado:homologado,
+			justificativa:justificativa
+		});
 	}
 	
 	/*
-	 * Cria uma nova inscrição // REMOVER
+	 * Atualiza o status de homologacao de recuso de uma inscrição 
 	 */
-	self.novo = function() {
-		window.location = contextPath + "/homologacao/inscricao/create";
+	self.homologarRecurso = function(id, homologado, justificativa) {
+		return inscricaoDataService.homologarRecurso({
+			id:id,
+			homologado:homologado,
+			justificativa:justificativa
+		});
 	}
-	
-	/*
-	 * Remove a inscrição selecionada // REMOVER
-	 */
-	self.remove = function(id) {
-		inscricaoDataService.remove(id).then(atualizaLista);
-	}
-	
+    
 	/*
 	 * Prepara a tabela
 	 */
@@ -52,7 +56,8 @@ App.controller("inscricaoController", function ($scope, inscricaoDataService, Ng
 				id: idEdital,
 				page: params.page() - 1,
 				size: params.count(),
-				nome: $scope.filtros.nome
+				nome: $scope.filtros.nome,
+				statusHomologacao: $scope.filtros.statusHomologacao
 			}).then(function (data) {
 				if(data.data.TotalRecordCount == 0) {
 					self.noSite = true;

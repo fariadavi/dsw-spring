@@ -26,24 +26,13 @@
 					<tr data-ng-repeat="item in $data"> 
 						<td class="mdl-data-table__cell--non-numeric" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.name'/>'">
 							{{item.nomeCandidato}}							
-						</td>
-						<td class="mdl-data-table__cell--non-numeric" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.inicial'/>'">
-        					<input class="" type="checkbox" data-ng-model="item.homologadoOriginal" name="chkSelecao" data-ng-change="ctrl.homologarOriginal(item.id,item.homologadoOriginal,item.justificativaHomologacaoOriginal)" />
-						</td>
-						<td class="mdl-data-table__cell--non-numeric" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.justificativa'/>'">
-							<textarea rows="2" cols="50" style="resize:none;" ng-model="item.justificativaHomologacaoOriginal"></textarea>
-						</td>
+						</td>					
 						<td class="mdl-data-table__cell--non-numeric" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.recurso'/>'">
 							<input class="" type="checkbox" data-ng-model="item.homologadoRecurso" name="chkRecurso" data-ng-change="ctrl.homologarRecurso(item.id,item.homologadoRecurso,item.justificativaHomologacaoRecurso)" />
 						</td>
 						<td class="mdl-data-table__cell--non-numeric" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologado.justificativa'/>'">
 							<textarea rows="2" cols="50" style="resize:none;" ng-model="item.justificativaHomologacaoRecurso"></textarea>
 						</td>
-<!-- 						<td class="text-center"> -->
-<%-- 							<button class="mdl-button mdl-js-button mdl-button--icon" confirmed-click="ctrl.remove(item.id)" ng-confirm-click="<spring:message code='edital.homologacao.inscricao.message.confirm.removal'/>"> --%>
-<!-- 								<i class="material-icons">delete</i> -->
-<!-- 							</button> -->
-<!-- 						</td> -->
 					</tr>
 				</table>
 				<div data-ng-show="ctrl.noSite" style="text-align: center">

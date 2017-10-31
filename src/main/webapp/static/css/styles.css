@@ -661,11 +661,10 @@ div.page-filter {
 	background: white;
 	padding: 8px;
 }
-div.page-filter input {
+div.page-filter input, div.page-filter select {
     font-size: 14px;
     margin-top: 8px;
 }
-
 /*
  * TABELAS PAGINADAS
  */
@@ -897,5 +896,6 @@ a > button > i.material-icons {
 	color: black;
 }
 
-
+.cols-table { width:25% !important; }
+.filtroDiv { margin-right: 100px; }
 

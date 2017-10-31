@@ -8,14 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import br.unirio.dsw.selecaoppgi.model.edital.Edital;
 import br.unirio.dsw.selecaoppgi.model.inscricao.AvaliacaoProvaEscrita;
 import br.unirio.dsw.selecaoppgi.model.inscricao.InscricaoEdital;
 import br.unirio.dsw.selecaoppgi.model.inscricao.InscricaoProjetoPesquisa;
-import br.unirio.dsw.selecaoppgi.model.usuario.Usuario;
 
 /**
  * Classe responsavel pela persistencia de inscrições em edital de seleção
@@ -33,21 +31,27 @@ public class InscricaoDAO extends AbstractDAO
 		int idCandidato = rs.getInt("idCandidato");
 		UsuarioDAO userDAO = new UsuarioDAO();
 		Edital edital = new EditalDAO().carregaEditalId(rs.getInt("idEdital"), userDAO);
-		Usuario candidato = userDAO.carregaUsuarioId(idCandidato);
 
 		InscricaoEdital inscricao = new InscricaoEdital(edital);
 		inscricao.setId(rs.getInt("id"));
+		
 		inscricao.setIdCandidato(idCandidato);
-		inscricao.setNomeCandidato(candidato.getNome());
+		if(rs.getString("nomeCandidato") != null)
+			inscricao.setNomeCandidato(rs.getString("nomeCandidato"));
+		else
+			inscricao.setNomeCandidato(userDAO.carregaUsuarioId(idCandidato).getNome());
+		
 		inscricao.setCotaNegros(rs.getInt("cotaNegros") != 0);
 		inscricao.setCotaDeficientes(rs.getInt("cotaDeficientes") != 0);
+		
 		inscricao.setHomologadoOriginal(rs.getInt("homologadoInicial") != 0);
-		inscricao.setJustificativaHomologacaoOriginal(rs.getString("justificativaHomologacaoInicial"));
 		inscricao.setHomologadoRecurso(rs.getInt("homologadoRecurso") != 0);
-		inscricao.setJustificativaHomologacaoRecurso(rs.getString("justificativaHomologacaoRecurso"));
 		inscricao.setDispensadoProvaOriginal(rs.getInt("dispensadoProvaInicial") != 0);
-		inscricao.setJustificativaDispensaOriginal(rs.getString("justificativaDispensaInicial"));
 		inscricao.setDispensadoProvaRecurso(rs.getInt("dispensadoProvaRecurso") != 0);
+
+		inscricao.setJustificativaHomologacaoOriginal(rs.getString("justificativaHomologacaoInicial"));
+		inscricao.setJustificativaHomologacaoRecurso(rs.getString("justificativaHomologacaoRecurso"));
+		inscricao.setJustificativaDispensaOriginal(rs.getString("justificativaDispensaInicial"));
 		inscricao.setJustificativaDispensaRecurso(rs.getString("justificativaDispensaRecurso"));
 //		this.projetosPesquisa = new ArrayList<InscricaoProjetoPesquisa>();
 //		this.provasEscritas = new ArrayList<AvaliacaoProvaEscrita>();
@@ -80,10 +84,28 @@ public class InscricaoDAO extends AbstractDAO
 	/**
 	 * Carrega a lista de inscrições de um determinado edital que podem ser homologadas
 	 */
-	public List<InscricaoEdital> carregaAvaliacaoHomologacao(int idEdital)
+	public List<InscricaoEdital> carregaAvaliacaoHomologacao(int idEdital, int pagina, int tamanhoPagina, String filtroNome, String filtroStatus)
 	{
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
-
+		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
+					 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
+					 "WHERE i.idEdital = ? AND u.nome LIKE ? ";
+		
+		String SQLStatus = "";
+		
+		switch(filtroStatus) {
+			case "Homologados":
+				SQLStatus = "AND i.homologadoInicial = 1 "; //Se fizer inicial e recurso na mesma tela, esse filtro deve usar o campo homologado
+				break;
+			case "Não-homologados":
+				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL ";
+				break;
+			case "Aguardando homologação":
+				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NULL ";
+				break;
+		}
+		
+		String SQLPaging = "ORDER BY dataAtualizacao DESC LIMIT ? OFFSET ?";
+		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -93,10 +115,14 @@ public class InscricaoDAO extends AbstractDAO
 		{
 			List<InscricaoEdital> listItems = new ArrayList<InscricaoEdital>();
 			
-			PreparedStatement ps = c.prepareStatement("SELECT * FROM Inscricao WHERE idEdital = ?");
+			PreparedStatement ps = c.prepareStatement(SQL + SQLStatus + SQLPaging);
 			ps.setLong(1, idEdital);
+			ps.setString(2, "%" + filtroNome + "%");
+			ps.setInt(3, tamanhoPagina);
+			ps.setInt(4, pagina * tamanhoPagina);
 			
 			ResultSet rs = ps.executeQuery();
+			
 			while(rs.next())
 				listItems.add(carrega(rs));
 			
@@ -107,6 +133,53 @@ public class InscricaoDAO extends AbstractDAO
 		{
 			log("InscricaoDAO.getAvaliacaoHomologacao: " + e.getMessage());
 			return null;
+		}
+	}
+	
+	/**
+	 * Conta o numero de inscricoes em um edital que atendem aos filtros usados
+	 */
+	public int conta(int idEdital, String filtroNome, String filtroStatus)
+	{
+		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
+				 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
+				 "WHERE i.idEdital = ? AND u.nome LIKE ? ";
+	
+		String SQLStatus = "";
+		
+		switch(filtroStatus) {
+			case "Homologados":
+				SQLStatus = "AND i.homologadoInicial = 1"; //Se fizer inicial e recurso na mesma tela, esse filtro deve usar o campo homologado
+				break;
+			case "Não-homologados":
+				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL ";
+				break;
+			case "Aguardando homologação":
+				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NULL ";
+				break;
+		}
+		
+		Connection c = getConnection();
+		
+		if (c == null)
+			return 0;
+		
+		try
+		{
+			PreparedStatement ps = c.prepareStatement(SQL + SQLStatus);
+			ps.setLong(1, idEdital);
+			ps.setString(2, "%" + filtroNome + "%");
+
+			ResultSet rs = ps.executeQuery();
+			int count = rs.next() ? rs.getInt(1) : 0;
+
+			c.close();
+			return count;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.conta: " + e.getMessage());
+			return 0;
 		}
 	}
 	
@@ -272,7 +345,25 @@ public class InscricaoDAO extends AbstractDAO
 		// Muda a data de atualização do registro de inscrição para a data de hoje
 		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
 		// TODO Grupo 4: implementar este método em função do caso de uso #7
-		return false;
+		
+		Connection c = getConnection();
+		
+		if (c == null)
+			return false;
+		
+		try
+		{
+			CallableStatement cs = c.prepareCall("{call InscricaoDispensaProvaInicial(?)}");
+			cs.setInt(1, idInscricao);			
+			cs.execute();
+			c.close();
+			return true;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.DispensaProvaInicial: " + e.getMessage());
+			return false;
+		}				
 	}
 	
 	/**
@@ -284,7 +375,25 @@ public class InscricaoDAO extends AbstractDAO
 		// Muda a data de atualização do registro de inscrição para a data de hoje
 		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
 		// TODO Grupo 4: implementar este método em função do caso de uso #7
-		return false;
+		Connection c = getConnection();
+		
+		if (c == null)
+			return false;
+		
+		try
+		{
+			CallableStatement cs = c.prepareCall("{call InscricaoRecusaDispensaProvaInicial(?,?)}");
+			cs.setInt(1, idInscricao);		
+			cs.setString(2, justificativa);
+			cs.execute();
+			c.close();
+			return true;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.RecusaDispensaProvaInicial: " + e.getMessage());
+			return false;
+		}				
 	}
 	
 	/**
@@ -297,7 +406,24 @@ public class InscricaoDAO extends AbstractDAO
 		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
 		// Somente se o campo dispensadoProvaInicial estiver FALSE
 		// TODO Grupo 4: implementar este método em função do caso de uso #7
-		return false;
+		Connection c = getConnection();
+		
+		if (c == null)
+			return false;
+		
+		try
+		{
+			CallableStatement cs = c.prepareCall("{call InscricaoDispensaProvaRecurso(?)}");
+			cs.setInt(1, idInscricao);			
+			cs.execute();
+			c.close();
+			return true;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.DispensaProvaRecurso: " + e.getMessage());
+			return false;
+		}	
 	}
 	
 	/**
@@ -310,7 +436,25 @@ public class InscricaoDAO extends AbstractDAO
 		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
 		// Somente se o campo dispensadoProvaInicial estiver FALSE
 		// TODO Grupo 4: implementar este método em função do caso de uso #7
-		return false;
+		Connection c = getConnection();
+		
+		if (c == null)
+			return false;
+		
+		try
+		{
+			CallableStatement cs = c.prepareCall("{call InscricaoRecusaDispensaProvaRecurso(?,?)}");
+			cs.setInt(1, idInscricao);		
+			cs.setString(2, justificativa);
+			cs.execute();
+			c.close();
+			return true;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.RecusaDispensaProvaRecurso: " + e.getMessage());
+			return false;
+		}	
 	}
 	
 	/**
