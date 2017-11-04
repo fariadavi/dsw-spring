@@ -143,55 +143,103 @@ public class HomologacaoController {
 
 	// /edital/homologacao/dispensa
 	/**
-	 * Ação que redireciona o usuário para a tela de dispensa de uma prova
-	 * inicial
+	 * Ação que redireciona o usuário para a tela de homologação de dispensa de nota
 	 */
-	@RequestMapping(value = "/edital/homologacao/dispensa/inicial/{id}", method = RequestMethod.GET)
-	public ModelAndView mostraPaginaHomologacaoDispensaInicial(@PathVariable("id") int idEdital) {
-		ModelAndView model = new ModelAndView("/edital/homologacao/dispensaProvaInicial");
+	@RequestMapping(value = "/edital/homologacao/dispensa", method = RequestMethod.GET)
+	public ModelAndView mostraPaginaDispensaProvaInicial(HttpServletRequest request) {
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
 
-		Edital edital = editalDAO.carregaEditalId(idEdital, userDAO);
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
 
-		model.getModel().put("edital", edital);
-		return model;
+		if (edital.getStatus() == StatusEdital.Homologacao) {
+
+			for (Usuario u : edital.getComissaoSelecao()) {
+				if (u.getId() == usuario.getId())
+					return new ModelAndView("/edital/homologacao/dispensaNotaInicial");
+			}
+
+			for (Usuario u : edital.getComissaoRecursos()) {
+				if (u.getId() == usuario.getId())
+					return new ModelAndView("/edital/homologacao/dispensaNotaRecurso");
+			}
+		}
+
+		return new ModelAndView("/homepage/Index");
 	}
 
 	/**
-	 * Ação que redireciona o usuário para a tela de dispensa de uma prova de
-	 * recurso
-	 */
-	@RequestMapping(value = "/edital/homologacao/dispensa/recurso/{id}", method = RequestMethod.GET)
-	public ModelAndView mostraPaginaHomologacaoDispensaRecurso(@PathVariable("id") int idEdital) {
-		ModelAndView model = new ModelAndView("/edital/homologacao/dispensaProvaRecurso");
-
-		Edital edital = editalDAO.carregaEditalId(idEdital, userDAO);
-
-		model.getModel().put("edital", edital);
-		return model;
-	}
-
-	/**
-	 * Ação AJAX que lista todos os candidatos de um edital esperando
-	 * homologacao da dispensa
+	 * Ação AJAX que lista todos os candidatos de um edital esperando dispensa de nota
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/dispensa", method = RequestMethod.GET, produces = "application/json")
-	public String listaDispensa(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
-			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome) {
-		List<InscricaoEdital> dispensas = inscricaoDAO.carregaAvaliacaoDispensaProva(idEdital);
-		int total = dispensas.size();
+	@RequestMapping(value = "/edital/homologacao/dispensa/inicial", method = RequestMethod.GET, produces = "application/json")
+	public String listaDispensaProva(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
+			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
+			@ModelAttribute("status") String filtroStatus) {
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaInicial(idEdital, pagina, tamanho,
+				filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
 
 		Gson gson = new Gson();
-		JsonArray jsonDispensas = new JsonArray();
+		JsonArray jsonInscricoes = new JsonArray();
 
-		for (InscricaoEdital dispensa : dispensas)
-			jsonDispensas.add(gson.toJsonTree(dispensa));
+		for (InscricaoEdital inscricao : inscricoes)
+			jsonInscricoes.add(gson.toJsonTree(inscricao));
 
 		JsonObject root = new JsonObject();
 		root.addProperty("Result", "OK");
 		root.addProperty("TotalRecordCount", total);
-		root.add("Records", jsonDispensas);
+		root.add("Records", jsonInscricoes);
 		return root.toString();
+	}
+	
+	/**
+	 * Ação AJAX que lista todos os candidatos de um edital esperando homologacao de recurso da dispensa de prova 
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/dispensa/recurso", method = RequestMethod.GET, produces = "application/json")
+	public String listaDispensaProvaRecurso(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
+			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
+			@ModelAttribute("status") String filtroStatus) {
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaRecurso(idEdital, pagina, tamanho,
+				filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+
+		Gson gson = new Gson();
+		JsonArray jsonInscricoes = new JsonArray();
+
+		for (InscricaoEdital inscricao : inscricoes)
+			jsonInscricoes.add(gson.toJsonTree(inscricao));
+
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");
+		root.addProperty("TotalRecordCount", total);
+		root.add("Records", jsonInscricoes);
+		return root.toString();
+	}
+	
+
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/dispensaProva/inicial", method = RequestMethod.POST)
+	public boolean dispensarInicial(@RequestParam("id") int id, @RequestParam("dispensado") Boolean dispensado,
+			@RequestParam("justificativa") String justificativa) {
+		if (dispensado)
+			return inscricaoDAO.dispensaProvaInicial(id);
+		else
+			return inscricaoDAO.recusaDispensaProvaInicial(id, justificativa);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/dispensaProva/recurso", method = RequestMethod.POST)
+	public boolean dispensarRecurso(@RequestParam("id") int id, @RequestParam("dispensado") Boolean dispensado,
+			@RequestParam("justificativa") String justificativa) {
+		if (dispensado)
+			return inscricaoDAO.dispensaProvaRecurso(id);
+		else
+			return inscricaoDAO.recusaDispensaProvaRecurso(id, justificativa);
 	}
 
 	// /edital/homologacao/encerramento

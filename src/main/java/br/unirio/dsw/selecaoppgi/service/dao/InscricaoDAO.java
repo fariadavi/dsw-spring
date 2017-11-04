@@ -365,10 +365,29 @@ public class InscricaoDAO extends AbstractDAO
 	/**
 	 * Carrega a lista de inscrições de um determinado edital que podem ser dispensados de prova
 	 */
-	public List<InscricaoEdital> carregaAvaliacaoDispensaProva(int idEdital)
+	
+	public List<InscricaoEdital> carregaAvaliacaoDispensaProvaInicial(int idEdital, int pagina, int tamanhoPagina, String filtroNome, String filtroStatus)
 	{
-		// As inscrições devem estar homologadas na avaliação inicial ou no recurso
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
+		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
+					 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
+					 "WHERE i.idEdital = ? AND dispensadoProvaRecurso = 0 AND justificativaDispensaRecurso IS NULL AND u.nome LIKE ? ";
+		
+		String SQLStatus = "";
+		
+		switch(filtroStatus) {
+			case "Dispensados":
+				SQLStatus = "AND i.dispensadoProvaInicial = 1 ";
+				break;
+			case "Não-Dispensados":
+				SQLStatus = "AND i.dispensadoProvaInicial = 0 AND justificativaDispensaInicial IS NOT NULL ";
+				break;
+			case "Aguardando dispensa":
+				SQLStatus = "AND i.dispensadoProvaInicial = 0 AND justificativaDispensaInicial IS NULL ";
+				break;
+		}
+		
+		String SQLPaging = "ORDER BY u.nome ASC LIMIT ? OFFSET ?";
+		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -378,10 +397,14 @@ public class InscricaoDAO extends AbstractDAO
 		{
 			List<InscricaoEdital> listItems = new ArrayList<InscricaoEdital>();
 			
-			PreparedStatement ps = c.prepareStatement("SELECT * FROM Inscricao WHERE idEdital = ? AND (homologadoInicial != 0 OR homologadoRecurso != 0)");
+			PreparedStatement ps = c.prepareStatement(SQL + SQLStatus + SQLPaging);
 			ps.setLong(1, idEdital);
+			ps.setString(2, "%" + filtroNome + "%");
+			ps.setInt(3, tamanhoPagina);
+			ps.setInt(4, pagina * tamanhoPagina);
 			
 			ResultSet rs = ps.executeQuery();
+			
 			while(rs.next())
 				listItems.add(carrega(rs));
 			
@@ -390,10 +413,66 @@ public class InscricaoDAO extends AbstractDAO
 
 		} catch (SQLException e)
 		{
-			log("InscricaoDAO.getAvaliacaoDispensa: " + e.getMessage());
+			log("InscricaoDAO.carregaAvaliacaoDispensaProva: " + e.getMessage());
 			return null;
 		}
 	}
+	
+	/**
+	 * Carrega a lista de inscrições de provas não dispensadas de um determinado edital que podem ser dispensadas
+	 */
+	public List<InscricaoEdital> carregaAvaliacaoDispensaProvaRecurso(int idEdital, int pagina, int tamanhoPagina, String filtroNome, String filtroStatus)
+	{		
+		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
+					 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
+					 "WHERE i.idEdital = ? AND dispensadoProvaInicial = 0 AND justificativaDispensaInicial IS NOT NULL AND u.nome LIKE ? ";
+		
+		String SQLStatus = "";
+		
+		switch(filtroStatus) {
+			case "Dispensados":
+				SQLStatus = "AND i.dispensadoProvaRecurso = 1 "; 
+				break;
+			case "Não-Dispensados":
+				SQLStatus = "AND i.dispensadoProvaRecurso = 0 AND justificativaDispensaRecurso IS NOT NULL ";
+				break;
+			case "Aguardando dispensa":
+				SQLStatus = "AND i.dispensadoProvaRecurso = 0 AND justificativaDispensaRecurso IS NULL ";
+				break;
+		}
+		
+		String SQLPaging = "ORDER BY u.nome ASC LIMIT ? OFFSET ?";
+		
+		Connection c = getConnection();
+		
+		if (c == null)
+			return null;
+		
+		try
+		{
+			List<InscricaoEdital> listItems = new ArrayList<InscricaoEdital>();
+			
+			PreparedStatement ps = c.prepareStatement(SQL + SQLStatus + SQLPaging);
+			ps.setLong(1, idEdital);
+			ps.setString(2, "%" + filtroNome + "%");
+			ps.setInt(3, tamanhoPagina);
+			ps.setInt(4, pagina * tamanhoPagina);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next())
+				listItems.add(carrega(rs));
+			
+			c.close();
+			return listItems;
+
+		} catch (SQLException e)
+		{
+			log("InscricaoDAO.carregaAvaliacaoDispensaProvaRecurso: " + e.getMessage());
+			return null;
+		}
+	}
+	
 
 	/**
 	 * Registra a dispensa de provas de uma inscrição na avaliação inicial

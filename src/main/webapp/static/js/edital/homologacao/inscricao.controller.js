@@ -4,6 +4,7 @@ App.controller("inscricaoController", function($scope, inscricaoDataService, NgT
 	$scope.tipoStatus = [ "Aguardando homologação", "Homologados",
 			"Não-homologados", "Todos" ];
 
+	$scope.disabled= true;
 	/**
 	 * Filtros
 	 */
@@ -26,6 +27,14 @@ App.controller("inscricaoController", function($scope, inscricaoDataService, NgT
 		$scope.tableParams.reload();
 	}
 
+	/*
+	 *	Libera o botão de Enviar 
+	 */
+	self.liberarSend = function(itemId){
+		if ($scope.disabled == true)
+			angular.element(document.getElementById(itemId)).scope().disabled = false
+	}
+	
 	/*
 	 * Atualiza o status de homologacao original de uma inscrição
 	 */

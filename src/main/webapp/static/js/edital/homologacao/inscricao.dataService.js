@@ -1,7 +1,6 @@
 App.factory("inscricaoDataService", ["$http", function ($http) {
 	return {
-		lista: function(params) {
-			debugger
+		lista: function(params) {			
 			if(params.comissao == "selecao")
 				return $http.get(contextPath + "/edital/homologacao/inscricao?idEdital=" + params.id +"&page=" + params.page + "&size=" + params.size + "&nome=" + (params.nome || "") + "&status=" + (params.statusHomologacao || ""));
 			else
