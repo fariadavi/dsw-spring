@@ -79,7 +79,7 @@ public class HomologacaoController {
 			@ModelAttribute("status") String filtroStatus) {
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
-		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus, "Inicial");
 
 		Gson gson = new Gson();
 		JsonArray jsonInscricoes = new JsonArray();
@@ -104,7 +104,7 @@ public class HomologacaoController {
 			@ModelAttribute("status") String filtroStatus) {
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
-		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus, "Recurso");
 
 		Gson gson = new Gson();
 		JsonArray jsonInscricoes = new JsonArray();
@@ -180,7 +180,7 @@ public class HomologacaoController {
 			@ModelAttribute("status") String filtroStatus) {
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaInicial(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
-		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus, "Inicial");
 
 		Gson gson = new Gson();
 		JsonArray jsonInscricoes = new JsonArray();
@@ -205,7 +205,7 @@ public class HomologacaoController {
 			@ModelAttribute("status") String filtroStatus) {
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaRecurso(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
-		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus, "Recurso");
 
 		Gson gson = new Gson();
 		JsonArray jsonInscricoes = new JsonArray();
