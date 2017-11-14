@@ -1,10 +1,9 @@
 App.controller("dispensaController", function($scope, dispensaDataService, NgTableParams) {
 	var self = this;
 
-	$scope.tipoStatus = [ "Aguardando dispensa", "Dispensados",
-			"Não-Dispensados", "Todos" ];
+	$scope.tipoStatus = ["Aguardando dispensa", "Dispensados", "Não-dispensados", "Todos"];
 
-	$scope.disabled= true;
+	$scope.disabled = true;
 	/**
 	 * Filtros
 	 */
@@ -30,38 +29,24 @@ App.controller("dispensaController", function($scope, dispensaDataService, NgTab
 	/*
 	 *	Libera o botão de Enviar 
 	 */
-	self.liberarSend = function(itemId){
-		if ($scope.disabled == true)
-			angular.element(document.getElementById(itemId)).scope().disabled = false
+	self.liberarSend = function(itemId, dispensado, justificativa){
+		angular.element(document.getElementById(itemId)).scope().disabled = !dispensado && !justificativa;
 	}
 	
 	/*
-	 * Atualiza o status de dispensa inicial de prova de uma inscrição
+	 * Atualiza o status de dispensa de prova de uma inscrição
 	 */
-	self.dispensarInicial = function(id, dispensado, justificativa) {
-		return dispensaDataService.dispensarInicial({
+	self.dispensar = function(id, dispensado, justificativa) {
+		return dispensaDataService.dispensar({
 			id : id,
 			dispensado : dispensado,
-			justificativa : justificativa
+			justificativa : justificativa,
+			comissao : comissao
 		}).then(function successCallback(response) {
-			showError('Sucesso');
+			angular.element(document.getElementById(id)).scope().disabled = true;
+			showError('Inscrição atualizada com sucesso!');
 		}, function errorCallback(response) {
-			showError('Erro');
-		});
-	}
-
-	/*
-	 * Atualiza o status de recurso de dispensa de prova de uma inscrição
-	 */
-	self.dispensarRecurso = function(id, dispensado, justificativa) {		
-		return dispensaDataService.dispensarRecurso({
-			id : id,
-			dispensado : dispensado,
-			justificativa : justificativa
-		}).then(function successCallback(response) {
-			showError('Sucesso');
-		}, function errorCallback(response) {
-			showError('Erro');
+			showError('Ocorreu um erro ao atualizar a inscrição.');
 		});
 	}
 

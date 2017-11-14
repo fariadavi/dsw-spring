@@ -1,8 +1,7 @@
 App.controller("inscricaoController", function($scope, inscricaoDataService, NgTableParams) {
 	var self = this;
 
-	$scope.tipoStatus = [ "Aguardando homologação", "Homologados",
-			"Não-homologados", "Todos" ];
+	$scope.tipoStatus = ["Aguardando homologação", "Homologados", "Não-homologados", "Todos"];
 
 	$scope.disabled= true;
 	/**
@@ -30,38 +29,24 @@ App.controller("inscricaoController", function($scope, inscricaoDataService, NgT
 	/*
 	 *	Libera o botão de Enviar 
 	 */
-	self.liberarSend = function(itemId){
-		if ($scope.disabled == true)
-			angular.element(document.getElementById(itemId)).scope().disabled = false
+	self.liberarSend = function(itemId, homologado, justificativa){
+		angular.element(document.getElementById(itemId)).scope().disabled = !homologado && !justificativa;
 	}
 	
 	/*
-	 * Atualiza o status de homologacao original de uma inscrição
+	 * Atualiza o status de homologacao de uma inscrição
 	 */
-	self.homologarOriginal = function(id, homologado, justificativa) {
-		return inscricaoDataService.homologarOriginal({
+	self.homologar = function(id, homologado, justificativa) {
+		return inscricaoDataService.homologar({
 			id : id,
 			homologado : homologado,
-			justificativa : justificativa
+			justificativa : justificativa,
+			comissao: comissao
 		}).then(function successCallback(response) {
-			showError('Sucesso');
+			angular.element(document.getElementById(id)).scope().disabled = true;
+			showError('Inscrição atualizada com sucesso!');
 		}, function errorCallback(response) {
-			showError('Erro');
-		});
-	}
-
-	/*
-	 * Atualiza o status de homologacao de recuso de uma inscrição
-	 */
-	self.homologarRecurso = function(id, homologado, justificativa) {
-		return inscricaoDataService.homologarRecurso({
-			id : id,
-			homologado : homologado,
-			justificativa : justificativa
-		}).then(function successCallback(response) {
-			showError('Sucesso');
-		}, function errorCallback(response) {
-			showError('Erro');
+			showError('Ocorreu um erro ao atualizar a inscrição.');
 		});
 	}
 

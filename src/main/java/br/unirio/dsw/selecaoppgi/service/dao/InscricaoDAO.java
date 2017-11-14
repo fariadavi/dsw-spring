@@ -49,15 +49,17 @@ public class InscricaoDAO extends AbstractDAO
 		if(!(rs.getInt("homologadoRecurso") == 0 && rs.getString("justificativaHomologacaoRecurso") == null))
 			inscricao.setHomologadoRecurso(rs.getInt("homologadoRecurso") != 0);
 		
-		inscricao.setDispensadoProvaOriginal(rs.getInt("dispensadoProvaInicial") != 0);
-		inscricao.setDispensadoProvaRecurso(rs.getInt("dispensadoProvaRecurso") != 0);
+		if(!(rs.getInt("dispensadoProvaInicial") == 0 && rs.getString("justificativaDispensaInicial") == null))
+			inscricao.setDispensadoProvaOriginal(rs.getInt("dispensadoProvaInicial") != 0);
+		if(!(rs.getInt("dispensadoProvaRecurso") == 0 && rs.getString("justificativaDispensaRecurso") == null))
+			inscricao.setDispensadoProvaRecurso(rs.getInt("dispensadoProvaRecurso") != 0);
 
 		inscricao.setJustificativaHomologacaoOriginal(rs.getString("justificativaHomologacaoInicial"));
 		inscricao.setJustificativaHomologacaoRecurso(rs.getString("justificativaHomologacaoRecurso"));
 		inscricao.setJustificativaDispensaOriginal(rs.getString("justificativaDispensaInicial"));
 		inscricao.setJustificativaDispensaRecurso(rs.getString("justificativaDispensaRecurso"));
 //		this.projetosPesquisa = new ArrayList<InscricaoProjetoPesquisa>();
-//		this.provasEscritas = new ArrayList<AvaliacaoProvaEscrita>();
+//		this.provasEscritas = new ArrayList<AvaliacaoProvaEscrita>();ç
 		
 		return inscricao;
 	}
@@ -97,7 +99,7 @@ public class InscricaoDAO extends AbstractDAO
 		
 		switch(filtroStatus) {
 			case "Homologados":
-				SQLStatus = "AND i.homologadoInicial = 1 "; //Se fizer inicial e recurso na mesma tela, esse filtro deve usar o campo homologado
+				SQLStatus = "AND i.homologadoInicial = 1 ";
 				break;
 			case "Não-homologados":
 				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL ";
@@ -208,7 +210,7 @@ public class InscricaoDAO extends AbstractDAO
 		
 		switch(filtroStatus) {
 			case "Homologados":
-				SQLStatus = "AND i.homologadoInicial = 1"; //Se fizer inicial e recurso na mesma tela, esse filtro deve usar o campo homologado
+				SQLStatus = "AND i.homologadoInicial = 1";
 				break;
 			case "Não-homologados":
 				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL ";
@@ -247,10 +249,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean homologacaoInicial(int idInscricao)
 	{
-		// Muda o campo homologadoInicial para TRUE e limpa o campo justificativaHomologacaoInicial
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
-		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -276,10 +274,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean recusaHomologacaoInicial(int idInscricao, String justificativa)
 	{
-		// Muda o campo homologadoInicial para FALSE e preenche o campo justificativaHomologacaoInicial
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
-		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -306,11 +300,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean homologacaoRecurso(int idInscricao)
 	{
-		// Muda o campo homologadoRecurso para TRUE e limpa o campo justificativaHomologacaoRecurso
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver FALSE
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
-		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -336,11 +325,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean recusaHomologacaoRecurso(int idInscricao, String justificativa)
 	{
-		// Muda o campo homologadoRecurso para FALSE e preenche o campo justificativaHomologacaoRecurso
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver FALSE
-		// TODO Grupo 4: implementar este método em função do caso de uso #6
-		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -378,7 +362,7 @@ public class InscricaoDAO extends AbstractDAO
 			case "Dispensados":
 				SQLStatus = "AND i.dispensadoProvaInicial = 1 ";
 				break;
-			case "Não-Dispensados":
+			case "Não-dispensados":
 				SQLStatus = "AND i.dispensadoProvaInicial = 0 AND justificativaDispensaInicial IS NOT NULL ";
 				break;
 			case "Aguardando dispensa":
@@ -479,11 +463,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean dispensaProvaInicial(int idInscricao)
 	{
-		// Muda o campo dispensadoProvaInicial para TRUE e limpa o campo justificativaDispensaInicial
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
-		// TODO Grupo 4: implementar este método em função do caso de uso #7
-		
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -509,10 +488,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean recusaDispensaProvaInicial(int idInscricao, String justificativa)
 	{
-		// Muda o campo dispensadoProvaInicial para FALSE e preenche o campo justificativaDispensaInicial
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
-		// TODO Grupo 4: implementar este método em função do caso de uso #7
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -539,11 +514,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean dispensaProvaRecurso(int idInscricao)
 	{
-		// Muda o campo dispensadoProvaRecurso para TRUE e limpa o campo justificativaDispensaRecurso
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
-		// Somente se o campo dispensadoProvaInicial estiver FALSE
-		// TODO Grupo 4: implementar este método em função do caso de uso #7
 		Connection c = getConnection();
 		
 		if (c == null)
@@ -569,11 +539,6 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public boolean recusaDispensaProvaRecurso(int idInscricao, String justificativa)
 	{
-		// Muda o campo dispensadoProvaRecurso para FALSE e preenche o campo justificativaDispensaRecurso
-		// Muda a data de atualização do registro de inscrição para a data de hoje
-		// Somente se o campo homologadoInicial estiver TRUE ou o campo homologadoRecurso estiver TRUE
-		// Somente se o campo dispensadoProvaInicial estiver FALSE
-		// TODO Grupo 4: implementar este método em função do caso de uso #7
 		Connection c = getConnection();
 		
 		if (c == null)

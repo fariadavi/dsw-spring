@@ -2,7 +2,7 @@
 
 <script>
 	var idEdital = <c:out value="${sessionScope.edital.id}"/>
-	var comissao = 'selecao';
+	var comissao = 'original';
 </script>
 <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/static/third-party/ngTable/ng-table.min.css" />
 
@@ -41,26 +41,22 @@
 						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.dispensa.table.name'/>'">
 							{{item.nomeCandidato}}							
 						</td>
-						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.dispensa.table.homologado'/>'">
+						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.dispensa.table.dispensar'/>'">
                				<label for="option1_row{{$index}}">
-        						<input id="option1_row{{$index}}" name="dispensar_row{{$index}}" type="radio" data-ng-model="item.dispensadoProvaInicial" data-ng-value="true" data-ng-click="ctrl.liberarSend(item.id)" />
-								<spring:message code='edital.homologacao.dispensa.table.homologar.confirmar'/>
+        						<input id="option1_row{{$index}}" name="dispensar_row{{$index}}" type="radio" data-ng-model="item.dispensadoProvaOriginal" data-ng-value="true" data-ng-click="ctrl.liberarSend(item.id, item.dispensadoProvaOriginal, item.justificativaDispensaOriginal)" />
+								<spring:message code='edital.homologacao.dispensa.table.dispensar.confirmar'/>
         					</label>
         					<label for="option2_row{{$index}}">
-        						<input id="option2_row{{$index}}" name="dispensar_row{{$index}}" type="radio" data-ng-model="item.dispensadoProvaInicial" data-ng-value="false"  data-ng-click="ctrl.liberarSend(item.id)" />
-        						<spring:message code='edital.homologacao.dispensa.table.homologar.recusar'/>
+        						<input id="option2_row{{$index}}" name="dispensar_row{{$index}}" type="radio" data-ng-model="item.dispensadoProvaOriginal" data-ng-value="false"  data-ng-click="ctrl.liberarSend(item.id, item.dispensadoProvaOriginal, item.justificativaDispensaOriginal)" />
+        						<spring:message code='edital.homologacao.dispensa.table.dispensar.recusar'/>
        						</label>
 						</td>
-						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.dispensa.table.homologado.justificativa'/>'">
-							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaDispensaInicial" data-ng-disabled="item.dispensadoProvaInicial || item.dispensadoProvaInicial == null" data-ng-change="ctrl.liberarSend(item.id)"></textarea>
+						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.dispensa.table.dispensar.justificativa'/>'">
+							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaDispensaOriginal" data-ng-disabled="item.dispensadoProvaOriginal || item.dispensadoProvaOriginal == null" data-ng-change="ctrl.liberarSend(item.id, item.dispensadoProvaOriginal, item.justificativaDispensaOriginal)"></textarea>
 <!-- 							class="mdl-textfield__input"  -->
 						</td>
 						<td class="text-center">
-							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" 
-							id="{{item.id}}"							
-							data-ng-disabled="disabled"
-								data-ng-click="ctrl.dispensarInicial(item.id, item.dispensadoProvaInicial, item.justificativaDispensaInicial)">
-								<!-- data-ng-disabled="(item.homologadoOriginal == null || (!item.homologadoOriginal && (!item.justificativaHomologacaoOriginal || item.justificativaHomologacaoOriginal == null)))" -->
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="disabled" data-ng-click="ctrl.dispensar(item.id, item.dispensadoProvaOriginal, item.justificativaDispensaOriginal)">
 								<spring:message code='edital.homologacao.dispensa.table.comando.enviar'/>
 							</button>
 						</td>

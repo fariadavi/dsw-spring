@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,7 +73,7 @@ public class HomologacaoController {
 	 * Ação AJAX que lista todos os candidatos de um edital esperando homologacao da inscrição
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/inscricao", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/edital/homologacao/inscricao/original", method = RequestMethod.GET, produces = "application/json")
 	public String lista(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
 			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
 			@ModelAttribute("status") String filtroStatus) {
@@ -159,7 +158,7 @@ public class HomologacaoController {
 
 			for (Usuario u : edital.getComissaoSelecao()) {
 				if (u.getId() == usuario.getId())
-					return new ModelAndView("/edital/homologacao/dispensaNotaInicial");
+					return new ModelAndView("/edital/homologacao/dispensaNotaOriginal");
 			}
 
 			for (Usuario u : edital.getComissaoRecursos()) {
@@ -175,7 +174,7 @@ public class HomologacaoController {
 	 * Ação AJAX que lista todos os candidatos de um edital esperando dispensa de nota
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/dispensa/inicial", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/edital/homologacao/dispensa/original", method = RequestMethod.GET, produces = "application/json")
 	public String listaDispensaProva(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
 			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
 			@ModelAttribute("status") String filtroStatus) {
@@ -223,7 +222,7 @@ public class HomologacaoController {
 	
 
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/dispensaProva/inicial", method = RequestMethod.POST)
+	@RequestMapping(value = "/edital/homologacao/dispensa/original", method = RequestMethod.POST)
 	public boolean dispensarInicial(@RequestParam("id") int id, @RequestParam("dispensado") Boolean dispensado,
 			@RequestParam("justificativa") String justificativa) {
 		if (dispensado)
@@ -233,7 +232,7 @@ public class HomologacaoController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/dispensaProva/recurso", method = RequestMethod.POST)
+	@RequestMapping(value = "/edital/homologacao/dispensa/recurso", method = RequestMethod.POST)
 	public boolean dispensarRecurso(@RequestParam("id") int id, @RequestParam("dispensado") Boolean dispensado,
 			@RequestParam("justificativa") String justificativa) {
 		if (dispensado)
