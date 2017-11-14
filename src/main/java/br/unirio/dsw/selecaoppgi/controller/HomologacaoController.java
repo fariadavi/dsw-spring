@@ -66,7 +66,7 @@ public class HomologacaoController {
 			}
 		}
 
-		return new ModelAndView("/homepage/Index");
+		return new ModelAndView("redirect:/?message=edital.homologacao.acesso.negado");
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class HomologacaoController {
 			}
 		}
 
-		return new ModelAndView("/homepage/Index");
+		return new ModelAndView("redirect:/?message=edital.homologacao.acesso.negado");
 	}
 
 	/**

@@ -57,7 +57,7 @@
 <!-- 							class="mdl-textfield__input"  -->
 						</td>
 						<td class="text-center">
-							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="true" data-ng-click="ctrl.homologarRecurso(item.id, item.homologadoRecurso, item.justificativaHomologacaoRecurso)">
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="disabled" data-ng-click="ctrl.homologar(item.id, item.homologadoRecurso, item.justificativaHomologacaoRecurso)">
 								<spring:message code='edital.homologacao.inscricao.table.comando.enviar'/>
 							</button>
 						</td>
