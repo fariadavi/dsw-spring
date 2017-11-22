@@ -48,7 +48,7 @@
 							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaHomologacaoRecurso" data-ng-disabled="item.homologadoRecurso || item.homologadoRecurso == null"  data-ng-change="ctrl.liberarSend(item.id, item.homologadoRecurso, item.justificativaHomologacaoRecurso)"></textarea>
 						</td>
 						<td class="text-center">
-							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="true" data-ng-click="ctrl.homologarRecurso(item.id, item.homologadoRecurso, item.justificativaHomologacaoRecurso)">
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="disabled" data-ng-click="ctrl.homologar(item.id, item.homologadoRecurso, item.justificativaHomologacaoRecurso)">
 								<spring:message code='edital.homologacao.inscricao.table.comando.enviar'/>
 							</button>
 						</td>

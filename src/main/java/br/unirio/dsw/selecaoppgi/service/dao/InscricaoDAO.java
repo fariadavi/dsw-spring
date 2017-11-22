@@ -149,7 +149,7 @@ public class InscricaoDAO extends AbstractDAO
 					 "WHERE i.idEdital = ? AND homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL AND u.nome LIKE ? ";
 		
 		String SQLStatus = "";
-		
+			
 		switch(filtroStatus) {
 			case "Homologados":
 				SQLStatus = "AND i.homologadoRecurso = 1 "; 
@@ -198,7 +198,7 @@ public class InscricaoDAO extends AbstractDAO
 	/**
 	 * Conta o numero de inscricoes em um edital que atendem aos filtros usados
 	 */
-	public int conta(int idEdital, String filtroNome, String filtroStatus)
+	public int conta(int idEdital, String filtroNome, String filtroStatus, String comissao)
 	{
 		String SQL = "SELECT i.*, u.nome as nomeCandidato " + 
 				 "FROM Inscricao i INNER JOIN USUARIO u ON i.idCandidato = u.id " + 
@@ -208,13 +208,22 @@ public class InscricaoDAO extends AbstractDAO
 		
 		switch(filtroStatus) {
 			case "Homologados":
-				SQLStatus = "AND i.homologadoInicial = 1";
+				SQLStatus = "AND i.homologado" + comissao + " = 1";
 				break;
 			case "Não-homologados":
-				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NOT NULL ";
+				SQLStatus = "AND i.homologado" + comissao + " = 0 AND justificativaHomologacao" + comissao + " IS NOT NULL ";
 				break;
 			case "Aguardando homologação":
-				SQLStatus = "AND i.homologadoInicial = 0 AND justificativaHomologacaoInicial IS NULL ";
+				SQLStatus = "AND i.homologado" + comissao + " = 0 AND justificativaHomologacao" + comissao + " IS NULL ";
+				break;
+			case "Dispensados":
+				SQLStatus = "AND i.dispensadoProva" + comissao + " = 1";
+				break;
+			case "Não-dispensados":
+				SQLStatus = "AND i.dispensadoProva" + comissao + " = 0 AND justificativaDispensa" + comissao + " IS NOT NULL ";
+				break;
+			case "Aguardando dispensa":
+				SQLStatus = "AND i.dispensadoProva" + comissao + " = 0 AND justificativaDispensa" + comissao + " IS NULL ";
 				break;
 		}
 		
@@ -415,7 +424,7 @@ public class InscricaoDAO extends AbstractDAO
 			case "Dispensados":
 				SQLStatus = "AND i.dispensadoProvaRecurso = 1 "; 
 				break;
-			case "Não-Dispensados":
+			case "Não-dispensados":
 				SQLStatus = "AND i.dispensadoProvaRecurso = 0 AND justificativaDispensaRecurso IS NOT NULL ";
 				break;
 			case "Aguardando dispensa":
