@@ -6,10 +6,6 @@
 </script>
 <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/static/third-party/ngTable/ng-table.min.css" />
 
-<!-- https://github.com/kybarg/mdl-selectfield | https://codepen.io/kybarg/pen/dGNeYw -->   
-<!-- <link rel="stylesheet" href="https://cdn.rawgit.com/kybarg/mdl-selectfield/mdl-menu-implementation/mdl-selectfield.min.css"> -->
-<!-- <script src="https://cdn.rawgit.com/kybarg/mdl-selectfield/mdl-menu-implementation/mdl-selectfield.min.js"></script> -->
-
 <div id="contents" data-ng-controller="inscricaoController as ctrl">
    <div class="mdl-grid">
         <div class="mdl-cell mdl-cell--12-col page-header">
@@ -23,10 +19,6 @@
 	            <input id="filtroNome" type="text" class="mdl-textfield__input" data-ng-change='ctrl.atualizaFiltro()' data-ng-model="filtros.nome" size="40"/>
 	            <label class="mdl-textfield__label" for="filtroNome"><spring:message code='edital.homologacao.inscricao.label.name.filter'/></label>
 			</div>
-<!-- 			<div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label filtroDiv"> -->
-<!-- 				<select id="filtroStatus" class="mdl-selectfield__select" data-ng-change="ctrl.atualizaFiltro()" data-ng-model="filtros.statusHomologacao" data-ng-options="x for x in tipoStatus"></select> -->
-<%-- 				<label class="mdl-selectfield__label" for="filtroStatus"><spring:message code='edital.homologacao.inscricao.label.status.filter'/></label> --%>
-<!-- 			</div> -->
 			
 			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label filtroDiv">
 				<select id="filtroStatus" class="mdl-textfield__input" data-ng-change="ctrl.atualizaFiltro()" data-ng-model="filtros.statusHomologacao" data-ng-options="x for x in tipoStatus"></select>
@@ -53,7 +45,6 @@
 						</td>
 						<td class="mdl-data-table__cell--non-numeric cols-table" header-class="'text-left'" data-title="'<spring:message code='edital.homologacao.inscricao.table.homologar.justificativa'/>'">
 							<textarea rows="3" cols="80" style="resize:none;" data-ng-model="item.justificativaHomologacaoOriginal" data-ng-disabled="item.homologadoOriginal || item.homologadoOriginal == null" data-ng-change="ctrl.liberarSend(item.id, item.homologadoOriginal, item.justificativaHomologacaoOriginal)"></textarea>
-<!-- 							class="mdl-textfield__input"  -->
 						</td>
 						<td class="text-center">
 							<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="{{item.id}}" data-ng-disabled="disabled" data-ng-click="ctrl.homologar(item.id, item.homologadoOriginal, item.justificativaHomologacaoOriginal)">

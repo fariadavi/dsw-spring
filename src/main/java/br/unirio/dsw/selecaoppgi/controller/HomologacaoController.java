@@ -37,8 +37,6 @@ public class HomologacaoController {
 	@Autowired
 	private InscricaoDAO inscricaoDAO;
 
-	// /edital/homologacao/inscricao
-
 	/**
 	 * Ação que redireciona o usuário para a tela de homologação de inscrições
 	 * de um edital
@@ -74,11 +72,22 @@ public class HomologacaoController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/edital/homologacao/inscricao/original", method = RequestMethod.GET, produces = "application/json")
-	public String lista(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
-			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
-			@ModelAttribute("status") String filtroStatus) {
+	public String lista(HttpServletRequest request, @ModelAttribute("page") int pagina, @ModelAttribute("size") int tamanho, 
+			@ModelAttribute("nome") String filtroNome, @ModelAttribute("status") String filtroStatus) {
+		
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		int idEdital = edital.getId();
+		
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
+		
 		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
 
 		Gson gson = new Gson();
@@ -99,9 +108,19 @@ public class HomologacaoController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/edital/homologacao/inscricao/recurso", method = RequestMethod.GET, produces = "application/json")
-	public String listaRecurso(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
-			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
-			@ModelAttribute("status") String filtroStatus) {
+	public String listaRecurso(HttpServletRequest request, @ModelAttribute("page") int pagina, @ModelAttribute("size") int tamanho, 
+			@ModelAttribute("nome") String filtroNome, @ModelAttribute("status") String filtroStatus) {
+
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		int idEdital = edital.getId();
+		
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
 		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
@@ -140,7 +159,6 @@ public class HomologacaoController {
 			return inscricaoDAO.recusaHomologacaoRecurso(id, justificativa);
 	}
 
-	// /edital/homologacao/dispensa
 	/**
 	 * Ação que redireciona o usuário para a tela de homologação de dispensa de nota
 	 */
@@ -175,9 +193,19 @@ public class HomologacaoController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/edital/homologacao/dispensa/original", method = RequestMethod.GET, produces = "application/json")
-	public String listaDispensaProva(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
-			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
-			@ModelAttribute("status") String filtroStatus) {
+	public String listaDispensaProva(HttpServletRequest request, @ModelAttribute("page") int pagina, @ModelAttribute("size") int tamanho, 
+			@ModelAttribute("nome") String filtroNome, @ModelAttribute("status") String filtroStatus) {
+
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		int idEdital = edital.getId();
+		
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaInicial(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
 		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
@@ -200,9 +228,19 @@ public class HomologacaoController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/edital/homologacao/dispensa/recurso", method = RequestMethod.GET, produces = "application/json")
-	public String listaDispensaProvaRecurso(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
-			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
-			@ModelAttribute("status") String filtroStatus) {
+	public String listaDispensaProvaRecurso(HttpServletRequest request, @ModelAttribute("page") int pagina, @ModelAttribute("size") int tamanho, 
+			@ModelAttribute("nome") String filtroNome, @ModelAttribute("status") String filtroStatus) {
+
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		int idEdital = edital.getId();
+		
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaRecurso(idEdital, pagina, tamanho,
 				filtroNome, filtroStatus);
 		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus);
@@ -240,7 +278,4 @@ public class HomologacaoController {
 		else
 			return inscricaoDAO.recusaDispensaProvaRecurso(id, justificativa);
 	}
-
-	// /edital/homologacao/encerramento
-
 }
