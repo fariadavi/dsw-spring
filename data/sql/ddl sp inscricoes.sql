@@ -1,6 +1,7 @@
 DROP PROCEDURE IF EXISTS `InscricaoAceitaHomolagacaoInicial`;
+DROP PROCEDURE IF EXISTS `InscricaoAceitaHomologacaoInicial`;
 DELIMITER $$
-CREATE PROCEDURE `InscricaoAceitaHomolagacaoInicial`(vId INT)
+CREATE PROCEDURE `InscricaoAceitaHomologacaoInicial`(vId INT)
 BEGIN
 	UPDATE Inscricao
 	SET homologadoInicial = 1,
@@ -11,8 +12,9 @@ END$$
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS `InscricaoRecusaHomolagacaoInicial`;
+DROP PROCEDURE IF EXISTS `InscricaoRecusaHomologacaoInicial`;
 DELIMITER $$
-CREATE PROCEDURE `InscricaoRecusaHomolagacaoInicial`(vId INT, vJustificativa VARCHAR(4096))
+CREATE PROCEDURE `InscricaoRecusaHomologacaoInicial`(vId INT, vJustificativa VARCHAR(4096))
 BEGIN
 	UPDATE Inscricao
 	SET homologadoInicial = 0,
@@ -23,13 +25,14 @@ END$$
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS `InscricaoAceitaHomolagacaoRecurso`;
+DROP PROCEDURE IF EXISTS `InscricaoAceitaHomologacaoRecurso`;
 DELIMITER $$
-CREATE PROCEDURE `InscricaoAceitaHomolagacaoRecurso`(vId INT)
+CREATE PROCEDURE `InscricaoAceitaHomologacaoRecurso`(vId INT)
 BEGIN
 	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION ROLLBACK;
 	START TRANSACTION;
 
-	IF homolagadoInicial = 0 THEN
+	IF (SELECT homologadoInicial FROM inscricao WHERE id = @vId) = 0 THEN
 		UPDATE Inscricao
 		SET homologadoRecurso = 1,
 		justificativaHomologacaoRecurso = null,
@@ -42,8 +45,9 @@ END$$
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS `InscricaoRecusaHomolagacaoRecurso`;
+DROP PROCEDURE IF EXISTS `InscricaoRecusaHomologacaoRecurso`;
 DELIMITER $$
-CREATE PROCEDURE `InscricaoRecusaHomolagacaoRecurso`(vId INT, vJustificativa VARCHAR(4096))
+CREATE PROCEDURE `InscricaoRecusaHomologacaoRecurso`(vId INT, vJustificativa VARCHAR(4096))
 BEGIN
 	UPDATE Inscricao
 	SET homologadoRecurso = 0,
