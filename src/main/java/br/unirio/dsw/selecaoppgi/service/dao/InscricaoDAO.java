@@ -140,22 +140,6 @@ public class InscricaoDAO extends AbstractDAO
 	}
 
 	/**
-	 * Monta o relatório inicial e retorna
-	 */
-	public void mostraRelatorioHomologacaoInicial(int idEdital)
-	{
-		
-	}
-	
-	/**
-	 * Monta o relatório de recurso e retorna
-	 */
-	public void mostraRelatorioHomologacaoRecurso(int idEdital)
-	{
-		
-	}
-
-	/**
 	 * Carrega a lista de inscrições não homologadas de um determinado edital que podem ser homologadas
 	 */
 	public List<InscricaoEdital> carregaAvaliacaoHomologacaoRecurso(int idEdital, int pagina, int tamanhoPagina, String filtroNome, String filtroStatus)
