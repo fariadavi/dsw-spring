@@ -58,8 +58,6 @@ public class InscricaoDAO extends AbstractDAO
 		inscricao.setJustificativaHomologacaoRecurso(rs.getString("justificativaHomologacaoRecurso"));
 		inscricao.setJustificativaDispensaOriginal(rs.getString("justificativaDispensaInicial"));
 		inscricao.setJustificativaDispensaRecurso(rs.getString("justificativaDispensaRecurso"));
-//		this.projetosPesquisa = new ArrayList<InscricaoProjetoPesquisa>();
-//		this.provasEscritas = new ArrayList<AvaliacaoProvaEscrita>();ç
 		
 		return inscricao;
 	}
@@ -489,7 +487,7 @@ public class InscricaoDAO extends AbstractDAO
 	public boolean dispensaProvaInicial(int idInscricao)
 	{
 		Connection c = getConnection();
-		m
+		
 		if (c == null)
 			return false;
 		
