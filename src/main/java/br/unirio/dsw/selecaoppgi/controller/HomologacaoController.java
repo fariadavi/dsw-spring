@@ -139,6 +139,68 @@ public class HomologacaoController {
 		else
 			return inscricaoDAO.recusaHomologacaoRecurso(id, justificativa);
 	}
+	
+	
+	/**
+	 * Ação AJAX que mostra relatório de homologação
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/relatorio", method = RequestMethod.GET, produces = "application/json")
+	public String mostraRelatorio(HttpServletRequest request) {
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+
+		if (edital.getStatus() == StatusEdital.Homologacao) {
+
+			for (Usuario u : edital.getComissaoSelecao()) {
+				if (u.getId() == usuario.getId())
+					inscricaoDAO.mostraRelatorioHomologacaoInicial(edital.getId());			
+			}
+
+			for (Usuario u : edital.getComissaoRecursos()) {
+				if (u.getId() == usuario.getId())
+					inscricaoDAO.mostraRelatorioHomologacaoRecurso(edital.getId());
+			}
+		}
+		
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");		
+		return root.toString();
+	}
+	
+	/**
+	 * Ação AJAX que mostra relatório de homologação de recurso 
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/relatorio/recurso", method = RequestMethod.GET, produces = "application/json")
+	public String mostraRelatorioRecurso(@ModelAttribute("idEdital") int idEdital, @ModelAttribute("page") int pagina,
+			@ModelAttribute("size") int tamanho, @ModelAttribute("nome") String filtroNome,
+			@ModelAttribute("status") String filtroStatus) {
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoDispensaProvaRecurso(idEdital, pagina, tamanho,
+				filtroNome, filtroStatus);
+		int total = inscricaoDAO.conta(idEdital, filtroNome, filtroStatus, "Recurso");
+
+		Gson gson = new Gson();
+		JsonArray jsonInscricoes = new JsonArray();
+
+		for (InscricaoEdital inscricao : inscricoes)
+			jsonInscricoes.add(gson.toJsonTree(inscricao));
+
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");
+		root.addProperty("TotalRecordCount", total);
+		root.add("Records", jsonInscricoes);
+		return root.toString();
+	}
+	
+	
+	
 
 	// /edital/homologacao/dispensa
 	/**
@@ -240,6 +302,7 @@ public class HomologacaoController {
 		else
 			return inscricaoDAO.recusaDispensaProvaRecurso(id, justificativa);
 	}
+	
 
 	// /edital/homologacao/encerramento
 
