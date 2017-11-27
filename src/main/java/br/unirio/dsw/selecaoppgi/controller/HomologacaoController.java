@@ -1,5 +1,6 @@
 package br.unirio.dsw.selecaoppgi.controller;
 
+import java.io.FileOutputStream;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import br.unirio.dsw.selecaoppgi.model.edital.Edital;
 import br.unirio.dsw.selecaoppgi.model.edital.StatusEdital;
@@ -66,6 +71,51 @@ public class HomologacaoController {
 
 		return new ModelAndView("redirect:/?message=edital.homologacao.acesso.negado");
 	}
+	
+	/**
+	 * Ação AJAX que mostra relatório de homologação
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/edital/homologacao/relatorio", method = RequestMethod.GET, produces = "application/json")
+	public String mostraRelatorio(HttpServletRequest request) {
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    		
+
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream(""));
+            document.open();
+            if (edital.getStatus() == StatusEdital.Homologacao) {
+
+    			for (Usuario u : edital.getComissaoSelecao()) {
+    				if (u.getId() == usuario.getId())
+    					inscricaoDAO.mostraRelatorioHomologacaoInicial(edital.getId(),document);			
+    			}
+
+    			for (Usuario u : edital.getComissaoRecursos()) {
+    				if (u.getId() == usuario.getId())
+    					inscricaoDAO.mostraRelatorioHomologacaoRecurso(edital.getId(),document);
+    			}
+    		}            
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+		
+		
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");		
+		return root.toString();
+	}
+	
 
 	/**
 	 * Ação AJAX que lista todos os candidatos de um edital esperando homologacao da inscrição

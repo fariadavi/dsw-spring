@@ -10,6 +10,19 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chapter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+
 import br.unirio.dsw.selecaoppgi.model.edital.Edital;
 import br.unirio.dsw.selecaoppgi.model.inscricao.AvaliacaoProvaEscrita;
 import br.unirio.dsw.selecaoppgi.model.inscricao.InscricaoEdital;
@@ -352,6 +365,93 @@ public class InscricaoDAO extends AbstractDAO
 			return false;
 		}
 	}
+	
+	/**
+	 * Monta o relatório inicial e retorna
+	 * @throws DocumentException 
+	 */
+	public void mostraRelatorioHomologacaoInicial(int idEdital,Document document) throws DocumentException
+	{
+		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+	            Font.BOLD);
+	    Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+	            Font.NORMAL, BaseColor.RED);
+	    Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+	            Font.BOLD);
+	    Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+	            Font.BOLD);
+		
+		document.addTitle("Relatório Homologação");
+        document.addSubject("Homologação Inicial");
+        document.addKeywords("Unirio, PDF, Homologação Inicial");
+        document.addAuthor("Unirio");
+        document.addCreator("Unirio");
+        
+        Paragraph preface = new Paragraph();        
+        preface.add(new Paragraph(" "));        
+        preface.add(new Paragraph("Homologação Inicial", catFont));
+        
+        Anchor anchor = new Anchor("Homologação Inicial", catFont);
+        anchor.setName("Homologação Inicial");        
+        Chapter catPart = new Chapter(new Paragraph(anchor), 1);
+        Paragraph subPara = new Paragraph("Subcategory 1", subFont);
+        Section subCatPart = catPart.addSection(subPara);
+        
+        PdfPTable table = new PdfPTable(3);        
+        PdfPCell c1 = new PdfPCell(new Phrase("Homologados"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+        table.addCell("Aluno 1");
+        table.addCell("Aluno 2");
+        
+        subCatPart.add(table);
+        
+        document.add(catPart);
+	}
+	
+	/**
+	 * Monta o relatório de recurso e retorna
+	 * @throws DocumentException 
+	 */
+	public void mostraRelatorioHomologacaoRecurso(int idEdital,Document document) throws DocumentException
+	{
+		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+	            Font.BOLD);
+	    Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+	            Font.NORMAL, BaseColor.RED);
+	    Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+	            Font.BOLD);
+	    Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+	            Font.BOLD);
+		
+		document.addTitle("Relatório Homologação");
+        document.addSubject("Homologação de Recurso");
+        document.addKeywords("Unirio, PDF, Homologação de Recurso");
+        document.addAuthor("Unirio");
+        document.addCreator("Unirio");
+        
+        Paragraph preface = new Paragraph();        
+        preface.add(new Paragraph(" "));        
+        preface.add(new Paragraph("Homologação de Recurso", catFont));
+        
+        Anchor anchor = new Anchor("Homologação de Recurso", catFont);
+        anchor.setName("Homologação de Recurso");        
+        Chapter catPart = new Chapter(new Paragraph(anchor), 1);
+        Paragraph subPara = new Paragraph("Subcategory 1", subFont);
+        Section subCatPart = catPart.addSection(subPara);
+        
+        PdfPTable table = new PdfPTable(3);        
+        PdfPCell c1 = new PdfPCell(new Phrase("Homologados"));
+        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        table.addCell(c1);
+        table.addCell("Aluno 1");
+        table.addCell("Aluno 2");
+        
+        subCatPart.add(table);
+        
+        document.add(catPart);
+	}
+
 	
 	/**
 	 * Carrega a lista de inscrições de um determinado edital que podem ser dispensados de prova
