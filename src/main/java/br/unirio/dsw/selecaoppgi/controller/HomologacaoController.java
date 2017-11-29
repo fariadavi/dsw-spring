@@ -73,11 +73,11 @@ public class HomologacaoController {
 	}
 	
 	/**
-	 * Ação AJAX que mostra relatório de homologação
+	 * Ação AJAX que mostra relatório de homologação original
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/edital/homologacao/relatorio", method = RequestMethod.GET, produces = "application/json")
-	public String mostraRelatorio(HttpServletRequest request) {
+	@RequestMapping(value = "/relatorio/homologacao/homologacao/original", method = RequestMethod.GET, produces = "application/json")
+	public String mostraRelatorioOriginal(HttpServletRequest request) {
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
@@ -88,35 +88,68 @@ public class HomologacaoController {
 			request.getSession().setAttribute("edital", edital);
 		}
 		
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(edital.getId(), 10, 10,
+				"", "Homologados");
+		
 		try {
             Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream(""));
+            PdfWriter.getInstance(document, new FileOutputStream(file));
             document.open();
             if (edital.getStatus() == StatusEdital.Homologacao) {
-
     			for (Usuario u : edital.getComissaoSelecao()) {
     				if (u.getId() == usuario.getId())
-    					inscricaoDAO.mostraRelatorioHomologacaoInicial(edital.getId(),document);			
-    			}
-
-    			for (Usuario u : edital.getComissaoRecursos()) {
-    				if (u.getId() == usuario.getId())
-    					inscricaoDAO.mostraRelatorioHomologacaoRecurso(edital.getId(),document);
+    					inscricaoDAO.mostraRelatorioHomologacaoInicial(edital,document,inscricoes);			
     			}
     		}            
             document.close();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-		
+        }		
 		
 		JsonObject root = new JsonObject();
 		root.addProperty("Result", "OK");		
 		return root.toString();
 	}
 	
+	/**
+	 * Ação AJAX que mostra relatório de homologação de recurso
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/relatorio/homologacao/homologacao/recurso", method = RequestMethod.GET, produces = "application/json")
+	public String mostraRelatorioRecurso(HttpServletRequest request) {
+		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			
+		Edital edital = (Edital) request.getSession().getAttribute("edital");
+	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    		
 
+		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
+			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
+			request.getSession().setAttribute("edital", edital);
+		}
+		
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(edital.getId(), 10, 10,
+				"", "Homologados");
+		
+		try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            document.open();
+            if (edital.getStatus() == StatusEdital.Homologacao) {    			
+    			for (Usuario u : edital.getComissaoRecursos()) {
+    				if (u.getId() == usuario.getId())
+    					inscricaoDAO.mostraRelatorioHomologacaoRecurso(edital,document,inscricoes);
+    			}
+    		}            
+            document.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }	
+		
+		JsonObject root = new JsonObject();
+		root.addProperty("Result", "OK");		
+		return root.toString();
+	}
+	
 	/**
 	 * Ação AJAX que lista todos os candidatos de um edital esperando homologacao da inscrição
 	 */

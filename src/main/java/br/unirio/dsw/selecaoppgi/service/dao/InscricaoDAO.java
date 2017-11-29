@@ -370,7 +370,7 @@ public class InscricaoDAO extends AbstractDAO
 	 * Monta o relatório inicial e retorna
 	 * @throws DocumentException 
 	 */
-	public void mostraRelatorioHomologacaoInicial(int idEdital,Document document) throws DocumentException
+	public void mostraRelatorioHomologacaoInicial(Edital edital,Document document,List<InscricaoEdital> inscricoes) throws DocumentException
 	{
 		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
 	            Font.BOLD);
@@ -392,17 +392,28 @@ public class InscricaoDAO extends AbstractDAO
         preface.add(new Paragraph("Homologação Inicial", catFont));
         
         Anchor anchor = new Anchor("Homologação Inicial", catFont);
-        anchor.setName("Homologação Inicial");        
+        //anchor.setName("Homologação Inicial");        
         Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-        Paragraph subPara = new Paragraph("Subcategory 1", subFont);
+        Paragraph subPara = new Paragraph(edital.getNome(), subFont);
         Section subCatPart = catPart.addSection(subPara);
         
-        PdfPTable table = new PdfPTable(3);        
+        Paragraph paragraph = new Paragraph();
+        for (int i = 0; i < 1; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+        subCatPart.add(paragraph);
+        
+        PdfPTable table = new PdfPTable(1);        
         PdfPCell c1 = new PdfPCell(new Phrase("Homologados"));
         c1.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(c1);
+        
+        table.setHeaderRows(1);  
         table.addCell("Aluno 1");
         table.addCell("Aluno 2");
+       // for (InscricaoEdital inscricao : inscricoes) {
+       	// table.addCell(inscricao.getNomeCandidato());             
+       //}
         
         subCatPart.add(table);
         
@@ -413,7 +424,7 @@ public class InscricaoDAO extends AbstractDAO
 	 * Monta o relatório de recurso e retorna
 	 * @throws DocumentException 
 	 */
-	public void mostraRelatorioHomologacaoRecurso(int idEdital,Document document) throws DocumentException
+	public void mostraRelatorioHomologacaoRecurso(Edital edital,Document document,List<InscricaoEdital> inscricoes) throws DocumentException
 	{
 		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
 	            Font.BOLD);
@@ -437,15 +448,27 @@ public class InscricaoDAO extends AbstractDAO
         Anchor anchor = new Anchor("Homologação de Recurso", catFont);
         anchor.setName("Homologação de Recurso");        
         Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-        Paragraph subPara = new Paragraph("Subcategory 1", subFont);
+        Paragraph subPara = new Paragraph(edital.getNome(), subFont);
         Section subCatPart = catPart.addSection(subPara);
         
-        PdfPTable table = new PdfPTable(3);        
-        PdfPCell c1 = new PdfPCell(new Phrase("Homologados"));
+        Paragraph paragraph = new Paragraph();
+        for (int i = 0; i < 1; i++) {
+            paragraph.add(new Paragraph(" "));
+        }
+        subCatPart.add(paragraph);
+        
+        PdfPTable table = new PdfPTable(1);        
+        PdfPCell c1 = new PdfPCell(new Phrase("Homologados Recurso"));
         c1.setHorizontalAlignment(Element.ALIGN_CENTER);
         table.addCell(c1);
+        
+        table.setHeaderRows(1);        
         table.addCell("Aluno 1");
         table.addCell("Aluno 2");
+        //for (InscricaoEdital inscricao : inscricoes) {
+       	// table.addCell(inscricao.getNomeCandidato());             
+       //}
+       
         
         subCatPart.add(table);
         
