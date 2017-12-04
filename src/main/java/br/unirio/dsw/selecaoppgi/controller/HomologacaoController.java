@@ -88,7 +88,7 @@ public class HomologacaoController {
 			request.getSession().setAttribute("edital", edital);
 		}
 		
-		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(edital.getId(), 10, 10,
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(edital.getId(), 0, 10,
 				"", "Homologados");
 		
 		try {
@@ -120,14 +120,14 @@ public class HomologacaoController {
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
-	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    		
-
+	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    			     
+	    
 		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
 			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
 			request.getSession().setAttribute("edital", edital);
 		}
 		
-		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(edital.getId(), 10, 10,
+		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(edital.getId(), 0, 10,
 				"", "Homologados");
 		
 		try {

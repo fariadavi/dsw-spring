@@ -398,7 +398,7 @@ public class InscricaoDAO extends AbstractDAO
         Section subCatPart = catPart.addSection(subPara);
         
         Paragraph paragraph = new Paragraph();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             paragraph.add(new Paragraph(" "));
         }
         subCatPart.add(paragraph);
@@ -409,11 +409,11 @@ public class InscricaoDAO extends AbstractDAO
         table.addCell(c1);
         
         table.setHeaderRows(1);  
-        table.addCell("Aluno 1");
-        table.addCell("Aluno 2");
-       // for (InscricaoEdital inscricao : inscricoes) {
-       	// table.addCell(inscricao.getNomeCandidato());             
-       //}
+       // table.addCell("Aluno 1");
+       // table.addCell("Aluno 2");
+        for (InscricaoEdital inscricao : inscricoes) {
+       	 table.addCell(inscricao.getNomeCandidato());             
+       }
         
         subCatPart.add(table);
         
@@ -452,7 +452,7 @@ public class InscricaoDAO extends AbstractDAO
         Section subCatPart = catPart.addSection(subPara);
         
         Paragraph paragraph = new Paragraph();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 2; i++) {
             paragraph.add(new Paragraph(" "));
         }
         subCatPart.add(paragraph);
@@ -463,11 +463,11 @@ public class InscricaoDAO extends AbstractDAO
         table.addCell(c1);
         
         table.setHeaderRows(1);        
-        table.addCell("Aluno 1");
-        table.addCell("Aluno 2");
-        //for (InscricaoEdital inscricao : inscricoes) {
-       	// table.addCell(inscricao.getNomeCandidato());             
-       //}
+       // table.addCell("Aluno 1");
+       // table.addCell("Aluno 2");
+        for (InscricaoEdital inscricao : inscricoes) {
+       	 table.addCell(inscricao.getNomeCandidato());             
+       }
        
         
         subCatPart.add(table);
