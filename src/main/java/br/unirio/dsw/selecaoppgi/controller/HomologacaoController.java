@@ -1,11 +1,23 @@
 package br.unirio.dsw.selecaoppgi.controller;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -74,14 +86,17 @@ public class HomologacaoController {
 	
 	/**
 	 * Ação AJAX que mostra relatório de homologação original
+	 * @throws IOException 
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/relatorio/homologacao/homologacao/original", method = RequestMethod.GET, produces = "application/json")
-	public String mostraRelatorioOriginal(HttpServletRequest request) {
+	@RequestMapping(value = "/relatorio/homologacao/homologacao/original", method = RequestMethod.GET, produces = "application/pdf")
+	public ResponseEntity<byte[]> mostraRelatorioOriginal(HttpServletRequest request) throws IOException {
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
-	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    		
+		String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PdfOriginal.pdf").getAbsolutePath();	 
+		File file = new File(filePath);
+		Path path = Paths.get(filePath);
 
 		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
 			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
@@ -91,8 +106,8 @@ public class HomologacaoController {
 		List<InscricaoEdital> inscricoes = inscricaoDAO.carregaAvaliacaoHomologacao(edital.getId(), 0, 10,
 				"", "Homologados");
 		
-		try {
-            Document document = new Document();
+		Document document = new Document();
+		try {            
             PdfWriter.getInstance(document, new FileOutputStream(file));
             document.open();
             if (edital.getStatus() == StatusEdital.Homologacao) {
@@ -105,22 +120,34 @@ public class HomologacaoController {
         } catch (Exception e) {
             e.printStackTrace();
         }		
+				
+		byte[] contents = Files.readAllBytes(path);
 		
-		JsonObject root = new JsonObject();
-		root.addProperty("Result", "OK");		
-		return root.toString();
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.parseMediaType("application/pdf"));
+	    String filename = "PDFHomologadoOriginal.pdf";
+	    headers.setContentDispositionFormData(filename, filename);
+	    headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+	    ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(contents, headers, HttpStatus.OK);
+	    return response;
+	
+		//JsonObject root = new JsonObject();
+		//root.addProperty("Result", "OK");		
 	}
 	
 	/**
 	 * Ação AJAX que mostra relatório de homologação de recurso
+	 * @throws IOException 
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/relatorio/homologacao/homologacao/recurso", method = RequestMethod.GET, produces = "application/json")
-	public String mostraRelatorioRecurso(HttpServletRequest request) {
+	@RequestMapping(value = "/relatorio/homologacao/homologacao/recurso", method = RequestMethod.GET, produces = "application/pdf")
+	public ResponseEntity<byte[]> mostraRelatorioRecurso(HttpServletRequest request) throws IOException {
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
-	    String file = "C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/FirstPdf.pdf";	    			     
+	    String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PDFRecurso.pdf").getAbsolutePath();	    			     
+	    File file = new File(filePath);
+	    Path path = Paths.get(filePath);
 	    
 		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
 			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
@@ -145,9 +172,15 @@ public class HomologacaoController {
             e.printStackTrace();
         }	
 		
-		JsonObject root = new JsonObject();
-		root.addProperty("Result", "OK");		
-		return root.toString();
+		byte[] contents = Files.readAllBytes(path);
+		
+		HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.parseMediaType("application/pdf"));
+	    String filename = "PDFHomologadoRecurso.pdf";
+	    headers.setContentDispositionFormData(filename, filename);
+	    headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+	    ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(contents, headers, HttpStatus.OK);
+	    return response;
 	}
 	
 	/**

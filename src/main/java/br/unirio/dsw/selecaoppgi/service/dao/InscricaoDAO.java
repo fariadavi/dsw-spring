@@ -372,15 +372,11 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public void mostraRelatorioHomologacaoInicial(Edital edital,Document document,List<InscricaoEdital> inscricoes) throws DocumentException
 	{
-		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+		Font chapterFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
 	            Font.BOLD);
-	    Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-	            Font.NORMAL, BaseColor.RED);
-	    Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+	    Font subChapterFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
 	            Font.BOLD);
-	    Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-	            Font.BOLD);
-		
+	 	
 		document.addTitle("Relatório Homologação");
         document.addSubject("Homologação Inicial");
         document.addKeywords("Unirio, PDF, Homologação Inicial");
@@ -388,20 +384,19 @@ public class InscricaoDAO extends AbstractDAO
         document.addCreator("Unirio");
         
         Paragraph preface = new Paragraph();        
-        preface.add(new Paragraph(" "));        
-        preface.add(new Paragraph("Homologação Inicial", catFont));
+        preface.add(new Paragraph(" "));                
         
-        Anchor anchor = new Anchor("Homologação Inicial", catFont);
-        //anchor.setName("Homologação Inicial");        
-        Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-        Paragraph subPara = new Paragraph(edital.getNome(), subFont);
-        Section subCatPart = catPart.addSection(subPara);
+        Anchor anchor = new Anchor("Homologação Inicial", chapterFont);
+                
+        Chapter chapter = new Chapter(new Paragraph(anchor), 1);
+        Paragraph subParagraph = new Paragraph(edital.getNome(), subChapterFont);
+        Section section = chapter.addSection(subParagraph);
         
         Paragraph paragraph = new Paragraph();
         for (int i = 0; i < 2; i++) {
             paragraph.add(new Paragraph(" "));
         }
-        subCatPart.add(paragraph);
+        section.add(paragraph);
         
         PdfPTable table = new PdfPTable(1);        
         PdfPCell c1 = new PdfPCell(new Phrase("Homologados"));
@@ -409,15 +404,14 @@ public class InscricaoDAO extends AbstractDAO
         table.addCell(c1);
         
         table.setHeaderRows(1);  
-       // table.addCell("Aluno 1");
-       // table.addCell("Aluno 2");
+       
         for (InscricaoEdital inscricao : inscricoes) {
        	 table.addCell(inscricao.getNomeCandidato());             
        }
         
-        subCatPart.add(table);
+        section.add(table);
         
-        document.add(catPart);
+        document.add(chapter);
 	}
 	
 	/**
@@ -426,15 +420,11 @@ public class InscricaoDAO extends AbstractDAO
 	 */
 	public void mostraRelatorioHomologacaoRecurso(Edital edital,Document document,List<InscricaoEdital> inscricoes) throws DocumentException
 	{
-		Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+		Font chapterFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
 	            Font.BOLD);
-	    Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-	            Font.NORMAL, BaseColor.RED);
-	    Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+	    Font subChapterFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
 	            Font.BOLD);
-	    Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
-	            Font.BOLD);
-		
+	  
 		document.addTitle("Relatório Homologação");
         document.addSubject("Homologação de Recurso");
         document.addKeywords("Unirio, PDF, Homologação de Recurso");
@@ -442,20 +432,19 @@ public class InscricaoDAO extends AbstractDAO
         document.addCreator("Unirio");
         
         Paragraph preface = new Paragraph();        
-        preface.add(new Paragraph(" "));        
-        preface.add(new Paragraph("Homologação de Recurso", catFont));
+        preface.add(new Paragraph(" "));                
         
-        Anchor anchor = new Anchor("Homologação de Recurso", catFont);
-        anchor.setName("Homologação de Recurso");        
-        Chapter catPart = new Chapter(new Paragraph(anchor), 1);
-        Paragraph subPara = new Paragraph(edital.getNome(), subFont);
-        Section subCatPart = catPart.addSection(subPara);
+        Anchor anchor = new Anchor("Homologação de Recurso", chapterFont);
+                
+        Chapter chapter = new Chapter(new Paragraph(anchor), 1);
+        Paragraph subParagraph = new Paragraph(edital.getNome(), subChapterFont);
+        Section section = chapter.addSection(subParagraph);
         
         Paragraph paragraph = new Paragraph();
         for (int i = 0; i < 2; i++) {
             paragraph.add(new Paragraph(" "));
         }
-        subCatPart.add(paragraph);
+        subParagraph.add(paragraph);
         
         PdfPTable table = new PdfPTable(1);        
         PdfPCell c1 = new PdfPCell(new Phrase("Homologados Recurso"));
@@ -463,16 +452,14 @@ public class InscricaoDAO extends AbstractDAO
         table.addCell(c1);
         
         table.setHeaderRows(1);        
-       // table.addCell("Aluno 1");
-       // table.addCell("Aluno 2");
+   
         for (InscricaoEdital inscricao : inscricoes) {
        	 table.addCell(inscricao.getNomeCandidato());             
        }
-       
+               
+        subParagraph.add(table);
         
-        subCatPart.add(table);
-        
-        document.add(catPart);
+        document.add(chapter);
 	}
 
 	
