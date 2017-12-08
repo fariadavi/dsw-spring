@@ -1,5 +1,6 @@
 package br.unirio.dsw.selecaoppgi.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,7 +26,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import br.unirio.dsw.selecaoppgi.model.edital.Edital;
-import br.unirio.dsw.selecaoppgi.model.edital.StatusEdital;
 import br.unirio.dsw.selecaoppgi.model.inscricao.InscricaoEdital;
 import br.unirio.dsw.selecaoppgi.model.usuario.Usuario;
 import br.unirio.dsw.selecaoppgi.service.dao.EditalDAO;
@@ -54,9 +54,9 @@ public class RelatorioController
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
-		String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PdfOriginal.pdf").getAbsolutePath();	 
-		File file = new File(filePath);
-		Path path = Paths.get(filePath);
+//		String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PdfOriginal.pdf").getAbsolutePath();	 
+//		File file = new File(filePath);
+//		Path path = Paths.get(filePath);
 
 		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
 			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
@@ -68,10 +68,11 @@ public class RelatorioController
 		List<InscricaoEdital> inscricoesNaoHomologados = inscricaoDAO.carregaAvaliacaoHomologacao(edital.getId(), 0, 10,
 				"", "Não-homologados");
 		
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		
 		Document document = new Document();
 		try {            
-            PdfWriter.getInstance(document, new FileOutputStream(file));
+			PdfWriter.getInstance(document, output);
             document.open();
             //if (edital.getStatus() == StatusEdital.Homologacao) {
     			//for (Usuario u : edital.getComissaoSelecao()) {
@@ -84,7 +85,7 @@ public class RelatorioController
             e.printStackTrace();
         }		
 				
-		byte[] contents = Files.readAllBytes(path);
+		byte[] contents = output.toByteArray();
 		
 		HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -108,9 +109,9 @@ public class RelatorioController
 		Usuario usuario = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			
 		Edital edital = (Edital) request.getSession().getAttribute("edital");
-	    String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PDFRecurso.pdf").getAbsolutePath();	    			     
-	    File file = new File(filePath);
-	    Path path = Paths.get(filePath);
+	    //String filePath = new File("C:/Users/Daniel/Desktop/dsw-spring-master/dsw-spring/src/main/java/br/unirio/dsw/selecaoppgi/PDFRecurso.pdf").getAbsolutePath();	    			     
+	    //File file = new File(filePath);
+	    //Path path = Paths.get(filePath);
 	    
 		if ((edital == null || edital.getId() != usuario.getIdEdital()) && usuario.getIdEdital() > 0) {
 			edital = editalDAO.carregaEditalId(usuario.getIdEdital(), userDAO);
@@ -121,10 +122,12 @@ public class RelatorioController
 				"", "Homologados");
 		List<InscricaoEdital> inscricoesNaoHomologados = inscricaoDAO.carregaAvaliacaoHomologacaoRecurso(edital.getId(), 0, 10,
 				"", "Não-homologados");
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		
-		try {
-            Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream(file));
+		Document document = new Document();
+		try {            
+			PdfWriter.getInstance(document, output);
             document.open();
           //  if (edital.getStatus() == StatusEdital.Homologacao) {    			
     			//for (Usuario u : edital.getComissaoRecursos()) {
@@ -137,7 +140,7 @@ public class RelatorioController
             e.printStackTrace();
         }	
 		
-		byte[] contents = Files.readAllBytes(path);
+		byte[] contents = output.toByteArray();
 		
 		HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.parseMediaType("application/pdf"));
